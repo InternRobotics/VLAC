@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "evo-vlac"
+version = "1.0.0"
+description = "internEVO Critic and VLA deploy"
+readme = "README.md"
+authors = [
+    {name = "zhangqi", email = "zhangqi1@pjlab.org"}
+]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+requires-python = ">=3.7"
+dependencies = [
+]
+
+[project.urls]
+Homepage = "https://github.com/7-Z-7/InternEVO"
+Repository = "https://github.com/7-Z-7/InternEVO"
+
+[tool.setuptools.packages.find]
+include = ["evo_vlac*"]

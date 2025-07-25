@@ -22,6 +22,7 @@ import heapq
 from scipy.spatial import cKDTree
 from scipy.stats import spearmanr
 import random
+import numpy as np
 
 def clip_one(image):
     width, height = image.size
@@ -281,37 +282,29 @@ class GAC_model():
         pil_image = None
         
         if isinstance(image_input, Image.Image):
-            # 已经是PIL.Image对象
             pil_image = image_input
         elif isinstance(image_input, str):
             if image_input.startswith(('http://', 'https://')):
-                # URL
                 response = requests.get(image_input)
                 pil_image = Image.open(BytesIO(response.content))
             elif image_input.startswith('data:image'):
-                # base64编码的数据URL
                 header, encoded = image_input.split(',', 1)
                 image_data = base64.b64decode(encoded)
                 pil_image = Image.open(BytesIO(image_data))
             elif len(image_input) > 100 and not '/' in image_input and not '\\' in image_input:
-                # 可能是base64编码字符串（简单判断）
                 try:
                     image_data = base64.b64decode(image_input)
                     pil_image = Image.open(BytesIO(image_data))
                 except:
-                    # 如果base64解码失败，当作文件路径处理
                     pil_image = Image.open(image_input)
             else:
-                # 文件路径
                 pil_image = Image.open(image_input)
         else:
             raise ValueError(f"不支持的图像输入类型: {type(image_input)}")
         
-        # 转换为RGB模式（如果需要）
         if pil_image.mode != 'RGB':
             pil_image = pil_image.convert('RGB')
         
-        # 调整尺寸为448x448
         pil_image = pil_image.resize((448, 448), Image.Resampling.LANCZOS)
         
         return pil_image
@@ -341,14 +334,11 @@ class GAC_model():
                     'content': prompt[i]
                 }
             )
-            # 处理图像列表，统一转换为448x448的PIL.Image列表
             processed_images = None
             if images[i] is not None:
                 if isinstance(images[i], list):
-                    # images[i] 是一个图像列表
                     processed_images = [self._process_image_to_pil(img) for img in images[i] if img is not None]
                 else:
-                    # images[i] 是单个图像
                     processed_images = [self._process_image_to_pil(images[i])]
             
             infer_requests.append(TemplateInputs(
@@ -364,7 +354,6 @@ class GAC_model():
     def get_logprobs(self,infer_requests,return_mask=False,digit=False):
         old_mode=self.template.mode
         self.template.set_mode('train')
-        # self.model.train()
         mini_batch_encoded_inputs = [self.template.encode(infer_request) for infer_request in infer_requests]
         mini_batch_encoded_inputs = to_device(
             self.template.data_collator(mini_batch_encoded_inputs), self.model.device)
@@ -376,18 +365,14 @@ class GAC_model():
         self.template.set_mode(old_mode)
         if return_mask:
             if digit:
-                # 添加 digit_completion_mask
                 tokenizer = self.template.tokenizer
                 
-                # 创建 digit_completion_mask，形状与 completion_mask 相同
                 digit_completion_mask = torch.zeros_like(labels[:, -logits_to_keep:], dtype=torch.bool)
                 for i in range(labels.shape[0]):
                     for j in range(labels.shape[1] - logits_to_keep, labels.shape[1]):
                         if labels[i, j] != -100:
                             token_id = labels[i, j].item()
                             token_str = tokenizer.decode([token_id]).strip()
-                            # 检查 token 是否只包含数字或正负号
-                            # if re.match(r'^[+-]?\d+$', token_str):
                             if re.search(r'[0-9+\-]', token_str):
                                 digit_completion_mask[i, j - (labels.shape[1] - logits_to_keep)] = True
                 return per_token_logps, mini_batch_encoded_inputs['completion_mask'],digit_completion_mask
@@ -471,7 +456,6 @@ class GAC_model():
                 image_paths=[],
                 image_objects=list_video,
                 done_list=done_list,
-                # done_list=None,
                 critic_list=critic_list,
                 value_list=value_list,
                 task=task_description,
@@ -481,7 +465,7 @@ class GAC_model():
                 n_num=ref_num
             )
         else:
-            video_output=None
+            video_path=None
         return video_path,value_list,critic_list,done_list
     
     def web_trajectory_done(self, task_description, main_image_path, reference_image_path=None, rich=False):
@@ -503,7 +487,6 @@ class GAC_model():
         当有ref_image_list时,进行过程判断,输出0~1的渐变值
         当有gaol_image时,进行最终状态判断,输出0~1的突变值(与当有ref_image_list冲突),task=None时只依靠图片
         """
-        #done
         batch_prompt=[]
         batch_image=[]
         done_list=[]
@@ -561,7 +544,6 @@ class GAC_model():
         输入一条trajectory的所有图片,输出每张图片的critic和processing value
         可以给一条参考轨迹
         """
-        #critic
         batch_prompt=[]
         batch_image=[]
         critic_list=[]
@@ -624,7 +606,6 @@ class GAC_model():
                 critic_list=[float(one)/skip for one in critic_list]
             critic_list=[float(one)/addition_scale for one in critic_list]
             value_list=self.critic_to_value_simple(critic_list,simple=value_simple)
-            # value_list=[self.critic_to_value_simple(critic_list),think_pre_value_list,think_post_value_list]
         else:
             if reverse_eval:
                 critic_list=[0-float(one) for one in critic_list]
@@ -658,7 +639,6 @@ class GAC_model():
         import subprocess
         from video_tool import read_data_and_create_video,images_get_from_video
         if type(ref_image_list)  == str:
-            #如果ref_image_list结尾是pkl.gz
             if ref_image_list.endswith(".pkl.gz"):
                 ref_image_list = read_data_and_create_video(ref_image_list)
             else:
@@ -686,11 +666,9 @@ class GAC_model():
                 print("skip_window:",skip_window)
             else:
                 i+=1
-        # 读取原始数据文件
         with gzip.open(file_path, 'rb') as f:
             original_data = pickle.load(f)
         
-        # 创建输出目录
         base_dir = os.path.dirname(file_path)
         file_name = os.path.splitext(os.path.splitext(os.path.basename(file_path))[0])[0]  # 去掉.pkl.gz
         output_dir = os.path.join(base_dir, f"{file_name}_smoothed")
@@ -703,28 +681,23 @@ class GAC_model():
         with gzip.open(data_file, 'wb') as f:
             pickle.dump(new_data, f)
         
-        # 创建视频
         video_file = os.path.join(output_dir, f"{file_name}_smoothed.mp4")
         
-        # 临时保存图像帧
         temp_dir = os.path.join(output_dir, f"temp")
         os.makedirs(temp_dir, exist_ok=True)
         
         try:
-            # 保存图像帧
             for j, img in enumerate(new_images):
                 frame_file = os.path.join(temp_dir, f"frame_{j:06d}.png")
                 if hasattr(img, 'save'):
                     img.save(frame_file)
                 else:
-                    # 如果是numpy数组或其他格式
                     from PIL import Image
                     if isinstance(img, np.ndarray):
                         Image.fromarray(img).save(frame_file)
                     else:
                         Image.fromarray(np.array(img)).save(frame_file)
             
-            # 使用ffmpeg创建视频
             ffmpeg_cmd = [
                 'ffmpeg', '-y',
                 '-framerate', str(hz),
@@ -742,7 +715,6 @@ class GAC_model():
             print(f"Error creating video for segment {i}: {e}")
             
         finally:
-            # 清理临时文件
             import shutil
             if os.path.exists(temp_dir):
                 shutil.rmtree(temp_dir)
@@ -759,7 +731,6 @@ class GAC_model():
         from video_tool import read_data_and_create_video,images_get_from_video
         from magic_detect import adaptive_peak_valley_detection,plot_results
         if type(ref_image_list)  == str:
-            #如果ref_image_list结尾是pkl.gz
             if ref_image_list.endswith(".pkl.gz"):
                 ref_image_list = read_data_and_create_video(ref_image_list)
             else:
@@ -784,7 +755,6 @@ class GAC_model():
                         assist_peaks[peak_window[done_len-1]]=peak_window
                     peak_window=[]
             peak_list=list(assist_peaks.keys())
-            #合并连续的峰
             index=0
             while index<len(peak_list)-1:
                 if assist_peaks[peak_list[index+1]][0]-assist_peaks[peak_list[index]][-1]<=gap_merge_len:
@@ -813,11 +783,9 @@ class GAC_model():
             )
         
 
-        # 读取原始数据文件
         with gzip.open(file_path, 'rb') as f:
             original_data = pickle.load(f)
         
-        # 创建输出目录
         base_dir = os.path.dirname(file_path)
         file_name = os.path.splitext(os.path.splitext(os.path.basename(file_path))[0])[0]  # 去掉.pkl.gz
         output_dir = os.path.join(base_dir, f"{file_name}_segments")
@@ -826,17 +794,14 @@ class GAC_model():
         peaks = [one*skip for one in result['peaks']]
         valleys = [one*skip for one in result['valleys']]
         
-        # 创建上升段和下降段文件夹
         ascending_dir = os.path.join(output_dir, "ascending")
         descending_dir = os.path.join(output_dir, "descending")
         os.makedirs(ascending_dir, exist_ok=True)
         os.makedirs(descending_dir, exist_ok=True)
         
-        # 创建视频输出文件夹
         video_dir = os.path.join(output_dir, "videos")
         os.makedirs(video_dir, exist_ok=True)
         
-        # 合并并排序所有关键点
         all_points = []
         for p in peaks:
             all_points.append((p, 'peak'))
@@ -844,7 +809,6 @@ class GAC_model():
             all_points.append((v, 'valley'))
         all_points.sort(key=lambda x: x[0])
         
-        # 分割数据
         segments = []
         
         for i, (point_idx, point_type) in enumerate(all_points):
@@ -856,16 +820,13 @@ class GAC_model():
                 prev_type = all_points[i-1][1]
 
             end_idx = point_idx
-            # 确定段类型：从valley到peak是上升段，从peak到valley是下降段
             if prev_type == 'valley' and point_type == 'peak':
                 segment_type = 'ascending'
             elif prev_type == 'peak' and point_type == 'valley':
                 segment_type = 'descending'
             else:
-                # 连续的同类型点，跳过
                 continue
                 
-            # 提取数据段和图像段
             data_segment = original_data[start_idx:end_idx]
             image_segment = image_list[start_idx:end_idx]
             
@@ -877,20 +838,15 @@ class GAC_model():
                 'images': image_segment
             })
             
-            # start_idx = end_idx
         
-        # 如果最后一段是下降段，移除它
         if segments and segments[-1]['type'] == 'descending':
             segments.pop()
         
-        # 处理每个段
         for i, segment in enumerate(segments):
             segment_type = segment['type']
             
-            # 获取任务名
             task_name = self.get_trajectory_task(segment['images'])[0].split('</task>')[0].strip().replace(' ', '_').replace('.', '_').replace(',', '_')
             
-            # 保存数据文件
             if segment_type == 'ascending':
                 data_file = os.path.join(ascending_dir, f"{task_name}_{i:03d}.pkl.gz")
             else:
@@ -899,28 +855,23 @@ class GAC_model():
             with gzip.open(data_file, 'wb') as f:
                 pickle.dump(segment['data'], f)
             
-            # 创建视频
             video_file = os.path.join(video_dir, f"{segment_type}_{task_name}_{i:03d}.mp4")
             
-            # 临时保存图像帧
             temp_dir = os.path.join(output_dir, f"temp_{i}")
             os.makedirs(temp_dir, exist_ok=True)
             
             try:
-                # 保存图像帧
                 for j, img in enumerate(segment['images']):
                     frame_file = os.path.join(temp_dir, f"frame_{j:06d}.png")
                     if hasattr(img, 'save'):
                         img.save(frame_file)
                     else:
-                        # 如果是numpy数组或其他格式
                         from PIL import Image
                         if isinstance(img, np.ndarray):
                             Image.fromarray(img).save(frame_file)
                         else:
                             Image.fromarray(np.array(img)).save(frame_file)
                 
-                # 使用ffmpeg创建视频
                 ffmpeg_cmd = [
                     'ffmpeg', '-y',
                     '-framerate', str(hz),
@@ -938,7 +889,6 @@ class GAC_model():
                 print(f"Error creating video for segment {i}: {e}")
                 
             finally:
-                # 清理临时文件
                 import shutil
                 if os.path.exists(temp_dir):
                     shutil.rmtree(temp_dir)
@@ -981,7 +931,6 @@ class GAC_model():
         T = len(values_list)
         time_order = np.arange(T)
         
-        # 计算排名相关性
         correlation, _ = spearmanr(values_list, time_order)
         return correlation
     

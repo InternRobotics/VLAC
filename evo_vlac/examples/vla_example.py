@@ -6,7 +6,6 @@ import os
 
 #assign local model path
 model_path="set to your local model path"
-model_path='/cpfs04/user/zhangqi/zhangqi/data/model_garden/0619_intern8b_v7-1-part15-19-resize-decay/v1-20250624-140732/checkpoint-3125'
 
 view_images=["./images/test/595-44-565-0.jpg","./images/test/595-44-565-2.jpg"]
 eef_position=[

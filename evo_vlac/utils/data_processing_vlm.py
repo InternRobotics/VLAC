@@ -22,21 +22,17 @@ import pandas as pd
 
 
 def transform_images(text: str) -> str:
-    # 查找所有 <image>\n 的位置
     occurrences = re.findall(r"<image>\n", text)
     
-    # 如果出现次数少于或等于 1，则不做任何替换
     if len(occurrences) <= 1:
         return text
     
-    # 出现次数超过 1 时，逐个替换
     count = 0
     def replace_func(match):
         nonlocal count
         count += 1
         return f"Image-{count}: <image>\n"
-    
-    # 使用带回调函数的 re.sub 来进行替换
+
     transformed_text = re.sub(r"<image>\n", replace_func, text)
     
     return transformed_text
@@ -63,10 +59,8 @@ def is_image_almost_black(image_array, threshold=0.80, tolerance=10):
     nearly_black_pixels = np.sum(np.all(image_array <= tolerance, axis=-1))
     total_pixels = image_array.shape[0] * image_array.shape[1]
 
-    # Calculate the fraction of nearly black pixels
     fraction_black = nearly_black_pixels / total_pixels
 
-    # Check if the fraction exceeds the threshold
     return fraction_black >= threshold
 
 def is_image_path_almost_black(image_path):
@@ -75,7 +69,6 @@ def is_image_path_almost_black(image_path):
     except:
         return False
     image_array = np.array(img)
-    # Check if all pixel values are 0 (black image)
     return is_image_almost_black(image_array)
 
 
@@ -85,7 +78,6 @@ def is_image_path_black(image_path):
     except:
         return False
     image_array = np.array(img)
-    # Check if all pixel values are 0 (black image)
     return np.all(image_array == 0)
 
 def compare_images(image1_path, image2_path):
@@ -96,30 +88,61 @@ def compare_images(image1_path, image2_path):
     except:
         return -1
     
-    # Resize images to the same size (if they are not already)
     if img1.size != img2.size:
         img2 = img2.resize(img1.size)
     
-    # Convert images to numpy arrays
     img1_array = np.array(img1)
     img2_array = np.array(img2)
 
     if is_image_almost_black(img1_array) or is_image_almost_black(img2_array):
         return -1
     
-    # Calculate the difference
     difference = np.abs(img1_array - img2_array)
     
-    # Calculate the number of pixels that are different
     num_different_pixels = np.sum(difference > 0)
     
-    # Calculate the total number of pixels
     total_pixels = img1_array.size
     
-    # Calculate the percentage of different pixels
     percentage_difference = (num_different_pixels / total_pixels) * 100
     
     return percentage_difference
+
+def denormalize_with_params(normalized_data, params):
+    """
+    使用参数将归一化的数据还原到原始范围
+    
+    Args:
+        normalized_data: 归一化后的任意维度数组，但最后一个维度必须是7
+        params: 归一化参数字典
+        
+    Returns:
+        numpy.ndarray: 还原后的数据，维度与输入一致
+    """
+    # 转换为numpy数组
+    data_array = np.array(normalized_data)
+    original_shape = data_array.shape
+    
+    # 检查最后一个维度是否为7
+    if len(original_shape) < 2:
+        raise ValueError(f"输入数据至少应该是2维的，但得到的是{len(original_shape)}维")
+    
+    if original_shape[-1] != 7:
+        raise ValueError(f"输入数据的最后一个维度应该是7，但得到的是{original_shape[-1]}")
+    
+    # 将数据reshape为(..., 7)的形状，然后flatten前面的维度
+    working_data = data_array.reshape(-1, 7)
+    
+    # 提取参数
+    scale = np.array(params['scale'])
+    offset = np.array(params['offset'])
+    
+    # 反向变换: x = normalized * scale + offset
+    original_data = working_data * scale + offset
+    
+    # 恢复原始形状
+    original_data = original_data.reshape(original_shape)
+    
+    return original_data
 
 def agibot_process(action,action_type='action'):
     if action_type=='fast-chunk':
@@ -160,11 +183,9 @@ def songling_process_single(action,action_type='action'):
 
 def songling_process(action, action_type='action'):
     if type(action) is list:
-        # 检查是否为最内层的长度为7的列表
         if len(action) == 7 and all(not isinstance(item, list) for item in action):
             return songling_process_single(action, action_type)
         else:
-            # 递归处理嵌套列表
             new_action = []
             for one_action in action:
                 processed = songling_process(one_action, action_type)
@@ -313,21 +334,17 @@ def describe_move(move_vec):
     return description
 
 def denoise_action(action):
-    # 分割各部分数据
     xyz = action[:3]
     rpy = action[3:6]
     open_val = action[6]
 
-    # 角度规范化函数（将角度转换到[-180, 180]区间）
     def normalize_angle(angle):
         return (angle + 180) % 360 - 180
 
-    # 三维向量处理函数
     def process_dims(values, ref_max=None):
         abs_values = [abs(v) for v in values]
         max_val = max(abs_values)
         
-        # 全零特殊情况处理
         if max_val == 0:
             return [0, 0, 0]
             
@@ -345,18 +362,14 @@ def denoise_action(action):
                 processed[i] = 1 if values[i] > 0 else (-1 if values[i] < 0 else 0)
         return processed
 
-    # 处理rpy角度
     adjusted_rpy = [normalize_angle(v) for v in rpy]
     
-    # 处理xyz部分
     xyz_processed = process_dims(xyz)
     max_xyz = max(abs(v) for v in xyz)
     
-    # 处理rpy部分
     rpy_abs = [abs(v) for v in adjusted_rpy]
     max_rpy = max(rpy_abs)
     
-    # 判断是否满足清零条件
     if max_rpy < max_xyz * 0.25 and max_rpy <= 4:
         rpy_processed = [0, 0, 0]
     else:
@@ -660,7 +673,7 @@ class DataProcessor():
             "fast_action":"The current position state of the robotic arm's end gripper in the image is as follows: <state> {} </state>. What action chunks should the robot take to get better completion of instruction: <task> {} </task> <chunk>",
 
             "task_action_simple":"The current position state of the robotic arm's end gripper in the image is as follows: <state> {} </state>. What action should the robot take to get better completion of instruction: <task> {} </task> <(action)>",
-            #TO ADD
+
             "task_position":"The current position state of the robotic arm's end gripper in the image is as follows: <position> {} </position>. What position should the robot take to get better completion of instruction: <task> {} </task> <position>",
 
             "task_position_simple":"The current position state of the robotic arm's end gripper in the image is as follows: <(position)> {} </(position)>. What position should the robot take to get better completion of instruction: <task> {} </task> <(position)>",

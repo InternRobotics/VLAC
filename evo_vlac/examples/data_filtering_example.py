@@ -9,7 +9,7 @@ model_path="set to your local model path"
 
 #assign video path and task description
 test_video='./videos/pick-bowl-test.mp4'
-ref_video='./videos/pick-bowl-ref.mov'
+ref_video='./videos/pick-bowl-ref.mov'#optional
 task_description='Put up the bowl and place it back in the white storage box.'
 
 #init model
@@ -43,29 +43,21 @@ result_path,value_list,critic_list,done_list = Critic.web_trajectory_critic(
     output_path="results",
     fps=float(output_fps),
     frame_skip=True,#whether to skip frames(if false, each frame while be evaluated, cost more time)
-    done_flag=False,#whether to out put done value
-    in_context_done=False,#whether use reference video to generate done value
-    done_threshold=0.9,#done threshold
-    video_output=True#whether to output video
+    video_output=False
 )
 
-
+value_list=Critic.critic_to_value_simple(critic_list,'mix_f')
+voc=Critic.compute_voc(value_list)
+nr=Critic.compute_negative_rate(critic_list)
 print("=" * 100)
-print(">>>>>>>>>Critic results<<<<<<<<<<")
+print(">>>>>>>>>DATA diagnose<<<<<<<<<<")
 print(" ")
-
-print(f"result path: {result_path}")
-print(f"task description: {task_description}")
-print("=" * 50)
-
-print("value_list:")
-print(value_list)
+print(f'Negative rate: {nr}')
+print(f"VOC: {voc}")
+print("The larger the VOC value(-1~+1) and lower Negative rate(0~1), the better the data quality; overly values can directly filter out data, and specific thresholds can be selected based on the specific task.")
 print("=" * 50)
 
 print("critic_list:")
 print(critic_list)
+print("Actions corresponding to steps with a negative Critic can be filtered out to avoid interference with imitation learning by incorrect movements.")
 print("=" * 50)
-
-print("done_list:")
-print(done_list)
-print("=" * 100)

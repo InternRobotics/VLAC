@@ -5,7 +5,6 @@ import os
 
 #assign local model path
 model_path="set to your local model path"
-model_path='/cpfs04/user/zhangqi/zhangqi/data/model_garden/0619_intern8b_v7-1-part15-19-resize-decay/v1-20250624-140732/checkpoint-3125'
 
 #Input n images, output a critic_list of length n-1 and a value_list of length n. The critic evaluates the results of adjacent images (i, i+1); if i+1 is closer to accomplishing the task than i, the evaluation result is positive; otherwise, it is negative. It can evaluate the action rewards between any pair-wise images. The value_list is calculated based on the critic.
 test_images=['./images/test/595-6-565-0.jpg','./images/test/595-44-565-0.jpg','./images/test/595-134-565-0.jpg','./images/test/595-139-565-0.jpg','./images/test/595-292-565-0.jpg','./images/test/595-354-565-0.jpg']

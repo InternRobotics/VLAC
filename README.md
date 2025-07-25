@@ -58,7 +58,7 @@ Details about the model's performance and evaluation metrics can be found in the
 ```bibtex
 @article{grcritic2025,
   title={GRCritic: General Pair-wise Critic Model for Real World Embodied Reinforcement Learning},
-  author={Qi Zhang and Shaopeng Zhai},
+  author={Shanghai AI lab},
   year={2025},
   note={Paper coming soon}
 }

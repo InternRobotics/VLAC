@@ -61,7 +61,7 @@ GRCritic基于3000小时+人类数据、1200小时+综合公开机器人操作�
 ```bibtex
 @article{grcritic2025,
   title={GRCritic: General Pair-wise Critic Model for Real World Embodied Reinforcement Learning},
-  author={Qi Zhang and Shaopeng Zhai},
+  author={Shanghai AI lab},
   year={2025},
   note={Paper coming soon}
 }

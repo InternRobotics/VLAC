@@ -17,7 +17,7 @@
 </div>
 
 <div align="center">
-  <video src="data/title_banner-2.mp4" controls autoplay muted playsinline loop width="720"></video>
+  <img src="data/title_banner-2.gif" alt="VLAC banner" width="800"></img>
 </div>
 
 ## VLAC

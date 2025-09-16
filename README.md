@@ -163,10 +163,6 @@ For training code, please refer to [InternVL2](https://huggingface.co/OpenGVLab/
 
 If you find our work helpful, please cite:
 
-## 📄 License
-
-This project is licensed under the MIT License.
-
 ```bibtex
 @misc{VLAC2025,
     title = {A Vision-Language-Action-Critic Model for Robotic Real-World Reinforcement Learning},
@@ -175,6 +171,10 @@ This project is licensed under the MIT License.
     booktitle={arXiv},
 }
 ```
+
+## 📄 License
+
+This project is licensed under the MIT License.
 
 ## 🙏 Acknowledgments
 

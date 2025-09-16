@@ -157,9 +157,15 @@ More examples  of
 • data refinement. Please check [this example](evo_vlac/examples/data_filtering_example.py)
 
 
+For training code, please refer to [InternVL2](https://huggingface.co/OpenGVLab/InternVL2-2B#quick-start).
+
 ## 🔗 Citation
 
 If you find our work helpful, please cite:
+
+## 📄 License
+
+This project is licensed under the MIT License.
 
 ```bibtex
 @misc{VLAC2025,
@@ -169,5 +175,10 @@ If you find our work helpful, please cite:
     booktitle={arXiv},
 }
 ```
+
+## 🙏 Acknowledgments
+
+- [SWIFT](https://github.com/modelscope/ms-swift)
+- [InternVL](https://github.com/OpenGVLab/InternVL)
 
 

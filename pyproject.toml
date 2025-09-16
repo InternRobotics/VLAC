@@ -10,21 +10,21 @@ readme = "README.md"
 authors = [
     {name = "zhangqi", email = "zhangqi1@pjlab.org"}
 ]
-classifiers=[
-    'Development Status :: 4 - Beta',
-    'License :: OSI Approved :: Apache Software License',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.8',
-    'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10',
-    'Programming Language :: Python :: 3.11',
-    'Programming Language :: Python :: 3.12',
-],
-license='Apache License 2.0',
-requires-python = ">=3.7"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11"
+]
+license = "Apache-2.0"
+requires-python = ">=3.8"
 dependencies = [
-    "ms-swift==3.2.0"
+    "ms-swift==3.3",
+    "transformers>=4.51.0",
+    "peft>=0.15.2"
 ]
 
 [project.urls]

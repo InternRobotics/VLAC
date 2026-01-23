@@ -1,7 +1,7 @@
 # VLAC: A Vision-Language-Action-Critic Model for Robotic Real-World Reinforcement Learning
 <div align="center">
 
-[[paper]](data/VLAC_EAI.pdf)
+[[paper]](https://arxiv.org/abs/2509.15937)
 [[code]](https://github.com/InternRobotics/VLAC)
 [[model]](https://huggingface.co/InternRobotics/VLAC)
 

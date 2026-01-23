@@ -32,7 +32,7 @@ It provides robust evaluation capabilities for task progress prediction and task
 
 VLAC trained on 3000h+ human egocentric data, 1200h+ comprehensive public robotic manipulation data, and 15h+ self-collected manipulation data.
 
-## VLAC-8 is avaliable now.[[model-8b]](https://huggingface.co/InternRobotics/VLAC-8b)
+### VLAC-8 is avaliable now.[[model-8b]](https://huggingface.co/InternRobotics/VLAC-8b)
 
 ## ✨ Key Features
 

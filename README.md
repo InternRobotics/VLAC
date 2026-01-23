@@ -3,7 +3,9 @@
 
 [[paper]](https://arxiv.org/abs/2509.15937)
 [[code]](https://github.com/InternRobotics/VLAC)
-[[model]](https://huggingface.co/InternRobotics/VLAC)
+[[model-2b]](https://huggingface.co/InternRobotics/VLAC)
+[[model-8b]](https://huggingface.co/InternRobotics/VLAC-8b)
+
 
 </div>
 
@@ -20,6 +22,8 @@
   <img src="data/title_banner-2.gif" alt="VLAC banner" width="800"></img>
 </div>
 
+
+
 ## VLAC
 
 VLAC is a general-purpose pair-wise critic and manipulation model which designed for real world robot reinforcement learning and data refinement. 
@@ -27,6 +31,8 @@ VLAC is a general-purpose pair-wise critic and manipulation model which designed
 It provides robust evaluation capabilities for task progress prediction and task completion verification base one images and task description.
 
 VLAC trained on 3000h+ human egocentric data, 1200h+ comprehensive public robotic manipulation data, and 15h+ self-collected manipulation data.
+
+## VLAC-8 is avaliable now.[[model-8b]](https://huggingface.co/InternRobotics/VLAC-8b)
 
 ## ✨ Key Features
 

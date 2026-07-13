@@ -1,6 +1,7 @@
 # VLAC: A Vision-Language-Action-Critic Model for Robotic Real-World Reinforcement Learning
 <div align="center">
 
+[[ICML2026]](https://openreview.net/pdf?id=i7mfaYYLDf)
 [[paper]](https://arxiv.org/abs/2509.15937)
 [[code]](https://github.com/InternRobotics/VLAC)
 [[model-2b]](https://huggingface.co/InternRobotics/VLAC)
@@ -177,6 +178,13 @@ If you find our work helpful, please cite:
   author={Zhai, Shaopeng and Zhang, Qi and Zhang, Tianyi and Huang, Fuxian and Zhang, Haoran and Zhou, Ming and Zhang, Shengzhe and Liu, Litao and Lin, Sixu and Pang, Jiangmiao},
   journal={arXiv preprint arXiv:2509.15937},
   year={2025}
+}
+```
+```bibtex
+@inproceedings{zhanggeneralist,
+  title={A Generalist Pair-wise Progress Critic Model for Vision-Language-Action Robots},
+  author={Zhang, Qi and Zhai, Shaopeng and Zhang, Shengzhe and Liu, Litao and Zhang, Tianyi and Huang, Fuxian and Zhou, Ming},
+  booktitle={Forty-third International Conference on Machine Learning}
 }
 ```
 

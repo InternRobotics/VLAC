@@ -10,6 +10,21 @@
 
 </div>
 
+## VLAC-cut is ready
+A new Video Critic Model that can cut out bad or good segments in embodied trajectories.
+
+A dataset with rich progress annotations that includes both success and failure trajectories.
+
+<div align="center">
+  
+[[Paper]](https://arxiv.org/abs/2607.09776)
+[[Code]](https://github.com/InternRobotics/VLAC-cut)
+[[Model 30B-A3B]](https://huggingface.co/InternRobotics/VLAC-Cut)
+[[Benchmark]](https://huggingface.co/datasets/InternRobotics/VLAC-Cut-Benchmark)
+[[Full Data]](https://huggingface.co/datasets/InternRobotics/VLAC-Cut-FullData)
+
+</div>
+
 ## 🚀 Interactive Demo & Homepage
 
 <div align="center">

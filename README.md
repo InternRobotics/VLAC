@@ -1,4 +1,4 @@
-# 【ICML2026】VLAC: A Vision-Language-Action-Critic Model for Robotic Real-World Reinforcement Learning
+# VLAC: A Vision-Language-Action-Critic Model for Robotic Real-World Reinforcement Learning
 <div align="center">
 
 [[ICML2026]](https://openreview.net/pdf?id=i7mfaYYLDf)

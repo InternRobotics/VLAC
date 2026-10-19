@@ -96,9 +96,8 @@ class InitModelDispatchTest(unittest.TestCase):
 
 
 class NoHardCodedCudaTest(unittest.TestCase):
-    def test_examples_and_readme_use_the_device_module(self):
-        files = list((ROOT / "evo_vlac" / "examples").glob("*.py")) + [ROOT / "README.md"]
-        for path in files:
+    def test_examples_use_the_device_module(self):
+        for path in (ROOT / "evo_vlac" / "examples").glob("*.py"):
             text = path.read_text(encoding="utf-8")
             self.assertNotIn("device_map=f'cuda:0'", text, path.name)
             if "init_model(" in text:

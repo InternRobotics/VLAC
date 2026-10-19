@@ -94,6 +94,21 @@ Running Environment:
 | ms-swift |        | 3.3      |                                           |
 
 
+### How to run the same on Intel's XPU
+
+Install the XPU build of PyTorch instead of the CUDA one, then the rest of the requirements. Skip `flash-attn`, it is CUDA only:
+```shell
+pip install torch torchvision --index-url https://download.pytorch.org/whl/xpu
+pip install -e . --no-deps
+pip install "ms-swift==3.3" "transformers==4.51.3" "peft>=0.15.2" opencv-python loguru timm trl scipy
+```
+Run the Quick Start below with the device line replaced by the device module, which picks XPU, then CUDA, then CPU:
+```python
+from evo_vlac.utils.device_utils import default_device_map
+Critic.init_model(model_path=model_path,model_type='internvl2',device_map=default_device_map())  # or 'xpu:0'
+```
+The same line is used in the scripts under `evo_vlac/examples/`. Off CUDA the model loads with eager attention, because the InternVL2 remote code has no SDPA path and `flash-attn` is CUDA only.
+
 ## 🚀 Quick Start
 
 ```python

@@ -15,6 +15,7 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from data_processing_vlm import DataProcessor,trojectory_example_prompt,denormalize_with_params
 from video_tool import images_get_from_video, video_trajectory
+from evo_vlac.utils.device_utils import resolve_attn_impl
 import tqdm
 import math
 from collections import defaultdict
@@ -189,7 +190,8 @@ class GAC_model():
     def init_model(self,model_path,model_type='internvl2',device_map:str = 'auto',torch_dtype=torch.bfloat16,adapter: str = None):
         """
         Args:
-            device_map: ['auto', 'cuda:0',...]
+            device_map: ['auto', 'cuda:0', 'xpu:0', 'cpu',...]. Pass
+                `evo_vlac.utils.device_utils.default_device_map()` to pick the best backend.
         """
         template_type = model_type
         print(f'template_type: {template_type}')
@@ -197,7 +199,7 @@ class GAC_model():
                                             model_type=model_type,
                                             torch_dtype=torch_dtype,
                                             device_map=device_map,
-                                            attn_impl = 'flash_attn')
+                                            attn_impl = resolve_attn_impl(device_map))
         self.template = get_template(template_type, tokenizer)
         if adapter:
             self.model = Swift.from_pretrained(self.model, adapter, adapter_name=None)

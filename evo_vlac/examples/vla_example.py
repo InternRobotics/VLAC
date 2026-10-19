@@ -1,4 +1,5 @@
 from evo_vlac import GAC_model
+from evo_vlac.utils.device_utils import default_device_map
 from evo_vlac.utils.video_tool import compress_video
 import os
 #Example code for realizing VLA inference with open tasks and multi-perspective generalization capability, inputs 1-3 images and eef position, outputs delta eef actions, most friendly to songling (pika) robotic arms.
@@ -25,7 +26,7 @@ complete_requests_list=None#chat history
 
 #init model
 Policy=GAC_model(tag='Policy')
-Policy.init_model(model_path=model_path,model_type='internvl2',device_map=f'cuda:0')
+Policy.init_model(model_path=model_path,model_type='internvl2',device_map=default_device_map())#XPU > CUDA > CPU; pass e.g. 'cuda:1' to override
 Policy.temperature=0.5
 Policy.top_k=1
 Policy.set_config()

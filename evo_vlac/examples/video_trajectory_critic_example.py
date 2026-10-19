@@ -1,4 +1,5 @@
 from evo_vlac import GAC_model
+from evo_vlac.utils.device_utils import default_device_map
 from evo_vlac.utils.video_tool import compress_video
 import os
 #Consistent with the web interface, the value and citic rewards of video input can be evaluated.
@@ -14,7 +15,7 @@ task_description='Put up the bowl and place it back in the white storage box.'
 
 #init model
 Critic=GAC_model(tag='critic')
-Critic.init_model(model_path=model_path,model_type='internvl2',device_map=f'cuda:0')
+Critic.init_model(model_path=model_path,model_type='internvl2',device_map=default_device_map())#XPU > CUDA > CPU; pass e.g. 'cuda:1' to override
 Critic.temperature=0.5
 Critic.top_k=1
 Critic.set_config()
